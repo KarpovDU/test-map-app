@@ -1,9 +1,8 @@
 'use client'
 
-import { newMarker } from "@/lib/markerSlice";
+import { editSearchValue, newMarker } from "@/lib/markerSlice";
 import { AppDispatch, RootState } from "@/lib/Store";
 import { Button, Input } from "@nextui-org/react"
-import { PressEvent } from "@react-types/shared";
 import { GoPlus } from "react-icons/go"
 import { IoSearchOutline } from "react-icons/io5"
 import { useDispatch, useSelector } from "react-redux";
@@ -11,9 +10,19 @@ import { useDispatch, useSelector } from "react-redux";
 function ListHeader() {
 
     const dispatch = useDispatch<AppDispatch>();
+    const searchValue = useSelector((state: RootState) => state.markers).searchValue
     
     const onPress = () => {
         dispatch(newMarker())
+    }
+
+    const onSearch = (e: any) => {
+        const value = e.target.value
+        dispatch(editSearchValue(value))
+    }
+
+    const onClear = () => {
+        dispatch(editSearchValue(''))
     }
 
     return (
@@ -23,6 +32,9 @@ function ListHeader() {
             </div>
 
             <Input
+                onChange={onSearch}
+                onClear={onClear}
+                value={searchValue}
                 className="mt-2"
                 isClearable
                 label="Поиск"

@@ -10,6 +10,8 @@ import { PressEvent } from "@react-types/shared";
 
 const MarkerList: React.FC = () => {
     const markers = useSelector((state: RootState) => state.markers);
+    const searchValue = markers.searchValue
+    console.log(searchValue)
     const dispatch = useDispatch<AppDispatch>();
 
     const pressEvent = (e: PressEvent) => {
@@ -29,7 +31,7 @@ const MarkerList: React.FC = () => {
                         <ListHeader />
                         <div className="rounded-xl overflow-auto">
                         <div className="flex h-content flex-col  p-0 m-0">
-                            {markers.markers.map((marker) => (
+                            {markers.markers.filter((marker)=> marker.id === parseFloat(searchValue) || marker.name.includes(searchValue)).map((marker) => (
                                 <Button 
                                 id={marker.id != null ? marker.id.toString() : undefined}
                                 key={marker.id} 

@@ -20,4 +20,5 @@ export interface MarkerState {
         coordinates: LatLng
         zoomTime: number
     };
+    searchValue: string
 }

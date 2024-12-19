@@ -23,7 +23,7 @@ function getCurrentPosition(): LatLng  {
           lng: position.coords.longitude,
         };
       },
-      (error) => {
+      () => {
         return {
           lat: 58.002358,
           lng: 56.261055,
@@ -43,7 +43,8 @@ const initialState: MarkerState = {
   zoomedMarkerCoordinates: {
     coordinates: getCurrentPosition(),
     zoomTime: Date.now()
-  }
+  },
+  searchValue: ''
 };
 
 
@@ -88,8 +89,11 @@ const markerSlice = createSlice({
       }
       state.selectedMarker = newState
     },
+    editSearchValue: (state, action: PayloadAction<string>) => {
+      state.searchValue = action.payload
+    }
   }
 });
 
-export const { addMarker, selectMarker, editMarker, newMarker, saveEditedMarker } = markerSlice.actions;
+export const { addMarker, selectMarker, editMarker, newMarker, saveEditedMarker, editSearchValue } = markerSlice.actions;
 export default markerSlice.reducer;
