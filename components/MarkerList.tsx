@@ -11,7 +11,6 @@ import { PressEvent } from "@react-types/shared";
 const MarkerList: React.FC = () => {
     const markers = useSelector((state: RootState) => state.markers);
     const searchValue = markers.searchValue
-    console.log(searchValue)
     const dispatch = useDispatch<AppDispatch>();
 
     const pressEvent = (e: PressEvent) => {
