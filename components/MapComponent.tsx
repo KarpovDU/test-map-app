@@ -7,6 +7,8 @@ import L, { Map } from 'leaflet';
 import store, { AppDispatch, RootState } from '@/lib/Store';
 import { useDispatch, useSelector } from 'react-redux';
 import { selectMarker } from '@/lib/markerSlice';
+import { FaRegEnvelope, FaRegCalendarDays, FaRegBuilding   } from "react-icons/fa6";
+import { HiOutlinePhone } from "react-icons/hi2";
 
 
 L.Icon.Default.mergeOptions({
@@ -28,13 +30,13 @@ const MapComponent: React.FC = () => {
 
     const handleMarkerClick = useCallback((id: number) => () => {
         dispatch(selectMarker(id))
-  }, []);
+    }, []);
 
     useEffect(() => {
         if (mapRef.current) {
             mapRef.current.flyTo([selectedCoordinates.coordinates.lat, selectedCoordinates.coordinates.lng], mapRef.current.getZoom());
         }
-     }, [mapRef, selectedCoordinates]);
+    }, [mapRef, selectedCoordinates]);
 
     return (
         <div className='h-full w-[50%] p-5 -z-0'>
@@ -58,10 +60,10 @@ const MapComponent: React.FC = () => {
                     >
                         <Popup>
                             <div className='text-medium'>{marker.id}. {marker.name}</div>
-                            <br/>{marker.company}
-                            <br/>Email: {marker.email}
-                            <br/>Телефон: {marker.phoneNumber}
-                            <br/>Часы работы: {marker.workTime}
+                            {marker.company !== '' ? <div className='flex'><br /><FaRegBuilding className='mr-1'/><div className='font-bold mr-1'>{marker.company}</div></div> : null}
+                            {marker.email !== '' ? <div className='flex'><br /><FaRegEnvelope className='mr-1'/><div className='font-bold mr-1'>Email:</div>{marker.email}</div> : null}
+                            {marker.phoneNumber ? <div className='flex'><br /><HiOutlinePhone className='mr-1'/><div className='font-bold mr-1'>Телефон:</div>{marker.phoneNumber}</div> : null}
+                            {marker.workTime !== '' ? <div className='flex'><br /><FaRegCalendarDays className='mr-1'/><div className='font-bold mr-1'>Часы работы:</div>{marker.workTime}</div> : null}
                         </Popup>
                     </Marker>
                 ))}
