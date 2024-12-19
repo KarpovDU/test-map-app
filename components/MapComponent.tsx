@@ -16,12 +16,13 @@ L.Icon.Default.mergeOptions({
 });
 
 
+
 const MapComponent: React.FC = () => {
     const mapRef = useRef<Map | null>(null);
 
     const markers = useSelector((state: RootState) => state.markers);
     const selectedCoordinates = markers.zoomedMarkerCoordinates
-    const coordinates = store.getState().markers.zoomedMarkerCoordinates
+    const coordinates = store.getState().markers.zoomedMarkerCoordinates.coordinates
 
     const dispatch = useDispatch<AppDispatch>();
 
@@ -30,8 +31,8 @@ const MapComponent: React.FC = () => {
   }, []);
 
     useEffect(() => {
-        if (mapRef.current && selectedCoordinates.lat != 0 && selectedCoordinates.lng != 0 && selectedCoordinates.lat && selectedCoordinates.lng) {
-            mapRef.current.flyTo([selectedCoordinates.lat, selectedCoordinates.lng], mapRef.current.getZoom());
+        if (mapRef.current) {
+            mapRef.current.flyTo([selectedCoordinates.coordinates.lat, selectedCoordinates.coordinates.lng], mapRef.current.getZoom());
         }
      }, [mapRef, selectedCoordinates]);
 

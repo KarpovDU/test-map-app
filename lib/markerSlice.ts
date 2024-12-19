@@ -30,7 +30,7 @@ function getCurrentPosition(): LatLng  {
         };
       }
     );
-  } 
+  }
   return {
     lat: 58.002358,
     lng: 56.261055,
@@ -40,7 +40,10 @@ function getCurrentPosition(): LatLng  {
 const initialState: MarkerState = {
   markers: [],
   selectedMarker: selectedMarkerInitialState,
-  zoomedMarkerCoordinates: getCurrentPosition()
+  zoomedMarkerCoordinates: {
+    coordinates: getCurrentPosition(),
+    zoomTime: Date.now()
+  }
 };
 
 
@@ -50,7 +53,8 @@ const markerSlice = createSlice({
   reducers: {
     addMarker: (state, action: PayloadAction<MarkerData>) => {
       state.markers.push({ ...action.payload });
-      state.zoomedMarkerCoordinates = action.payload.coordinates
+      state.zoomedMarkerCoordinates.coordinates = action.payload.coordinates
+      state.zoomedMarkerCoordinates.zoomTime = Date.now()
       let length = state.markers.length
       const newState = {
         ...selectedMarkerInitialState,
@@ -60,14 +64,16 @@ const markerSlice = createSlice({
     },
     selectMarker: (state, action: PayloadAction<number>) => {
       state.markers.map((e) => e.id == action.payload ? state.selectedMarker = e : null)
-      state.zoomedMarkerCoordinates = state.selectedMarker.coordinates
+      state.zoomedMarkerCoordinates.coordinates = state.selectedMarker.coordinates
+      state.zoomedMarkerCoordinates.zoomTime = Date.now()
     },
     editMarker: (state, action: PayloadAction<MarkerData>) => {
       state.selectedMarker = action.payload
     },
     saveEditedMarker: (state,) => {
       state.markers = state.markers.map((e) => e.id == state.selectedMarker.id ? e = state.selectedMarker : e)
-      state.zoomedMarkerCoordinates = state.selectedMarker.coordinates
+      state.zoomedMarkerCoordinates.coordinates = state.selectedMarker.coordinates
+      state.zoomedMarkerCoordinates.zoomTime = Date.now()
       const newState = {
         ...selectedMarkerInitialState,
         id: length + 1
@@ -81,7 +87,7 @@ const markerSlice = createSlice({
         id: length + 1
       }
       state.selectedMarker = newState
-    }
+    },
   }
 });
 
