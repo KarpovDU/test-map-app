@@ -1,24 +1,19 @@
 'use client'
 
-import { Button, Card, CardBody, Input, Listbox, ListboxItem } from "@nextui-org/react";
+import { Button, Card, CardBody } from "@nextui-org/react";
 import { FaArrowRight } from "react-icons/fa";
 import { useDispatch, useSelector } from "react-redux";
-import { AppDispatch, RootState } from "@/lib/Store";
+import store, { AppDispatch, RootState } from "@/lib/Store";
 import ListHeader from "./ListHeader";
-import { selectMarker } from "@/lib/markerSlice";
-import { PressEvent } from "@react-types/shared";
+import { markerZoom, selectMarker } from "@/lib/markerSlice";
 
 const MarkerList: React.FC = () => {
     const markers = useSelector((state: RootState) => state.markers);
     const searchValue = markers.searchValue
     const dispatch = useDispatch<AppDispatch>();
 
-    const pressEvent = (e: PressEvent) => {
-        const att = e.target.getAttribute('id')
-        if(att) {
-            const id = parseFloat(att);
-            dispatch(selectMarker(id));
-        }
+    const pressEvent = (id: number) => {
+        store.getState().markers.selectedMarker.id === id? dispatch(markerZoom()): dispatch(selectMarker(id))  
     };
 
     
@@ -38,7 +33,7 @@ const MarkerList: React.FC = () => {
                                 variant="flat" 
                                 size="lg" 
                                 radius="none" 
-                                onPress={pressEvent}
+                                onPress={() => pressEvent(marker.id)}
                                 endContent={
                                 <FaArrowRight className="absolute right-5" />
                                 }>

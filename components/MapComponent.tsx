@@ -3,18 +3,21 @@
 import React, { useCallback, useEffect, useRef } from 'react';
 import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
-import L, { Map } from 'leaflet';
+import L, { Marker as LeafletMarker, Map } from 'leaflet';
 import store, { AppDispatch, RootState } from '@/lib/Store';
 import { useDispatch, useSelector } from 'react-redux';
-import { selectMarker } from '@/lib/markerSlice';
+import { editCoords, editMarker, markerZoom, selectMarker } from '@/lib/markerSlice';
 import { FaRegEnvelope, FaRegCalendarDays, FaRegBuilding   } from "react-icons/fa6";
 import { HiOutlinePhone } from "react-icons/hi2";
+import iconRetinaUrl from 'leaflet/dist/images/marker-icon-2x.png'
+import iconUrl from 'leaflet/dist/images/marker-icon.png'
+import shadowUrl from 'leaflet/dist/images/marker-shadow.png'
 
 
 L.Icon.Default.mergeOptions({
-    iconRetinaUrl: require('leaflet/dist/images/marker-icon-2x.png'),
-    iconUrl: require('leaflet/dist/images/marker-icon.png'),
-    shadowUrl: require('leaflet/dist/images/marker-shadow.png'),
+    iconRetinaUrl,
+    iconUrl,
+    shadowUrl
 });
 
 
@@ -24,25 +27,34 @@ const MapComponent: React.FC = () => {
 
     const markers = useSelector((state: RootState) => state.markers);
     const selectedCoordinates = markers.zoomedMarkerCoordinates
-    const coordinates = store.getState().markers.zoomedMarkerCoordinates.coordinates
+    const zoomTime = useSelector((state: RootState) => state.markers.zoomTime);
+    
 
     const dispatch = useDispatch<AppDispatch>();
 
     const handleMarkerClick = useCallback((id: number) => () => {
-        dispatch(selectMarker(id))
+        store.getState().markers.selectedMarker.id === id? dispatch(markerZoom()): dispatch(selectMarker(id))  
     }, []);
+
+    const dragMarker = useCallback(() => (e: any) => {
+        const leafletMarker = e.target as LeafletMarker;
+        const latLng = {...leafletMarker.getLatLng()}
+        const data = {...store.getState().markers.selectedMarker, coordinates: latLng}
+        dispatch(editMarker(data))
+        dispatch(editCoords(latLng))
+    }, [])
 
     useEffect(() => {
         if (mapRef.current) {
-            mapRef.current.flyTo([selectedCoordinates.coordinates.lat, selectedCoordinates.coordinates.lng], mapRef.current.getZoom());
+            mapRef.current.flyTo([selectedCoordinates.lat, selectedCoordinates.lng], mapRef.current.getZoom());
         }
-    }, [mapRef, selectedCoordinates]);
+    }, [mapRef, zoomTime]);
 
     return (
         <div className='h-full w-[50%] p-5 -z-0'>
             <MapContainer
                 ref={mapRef}
-                center={coordinates}
+                center={store.getState().markers.zoomedMarkerCoordinates}
                 zoom={13}
                 className='h-full w-full  rounded-2xl'
             >
@@ -52,11 +64,13 @@ const MapComponent: React.FC = () => {
                 />
                 {markers.markers.map((marker) => (
                     <Marker
+                        draggable={markers.selectedMarker.id === marker.id}
                         eventHandlers={{
-                            click: handleMarkerClick(marker.id)
+                            click: handleMarkerClick(marker.id),
+                            dragend: dragMarker()
                         }}
                         key={marker.id}
-                        position={[marker.coordinates.lat, marker.coordinates.lng]}
+                        position={markers.selectedMarker.id === marker.id ? selectedCoordinates : [marker.coordinates.lat, marker.coordinates.lng]}
                     >
                         <Popup>
                             <div className='text-medium'>{marker.id}. {marker.name}</div>

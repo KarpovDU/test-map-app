@@ -40,11 +40,9 @@ function getCurrentPosition(): LatLng  {
 const initialState: MarkerState = {
   markers: [],
   selectedMarker: selectedMarkerInitialState,
-  zoomedMarkerCoordinates: {
-    coordinates: getCurrentPosition(),
-    zoomTime: Date.now()
-  },
-  searchValue: ''
+  zoomedMarkerCoordinates: getCurrentPosition(),
+  searchValue: '',
+  zoomTime: Date.now()
 };
 
 
@@ -54,9 +52,9 @@ const markerSlice = createSlice({
   reducers: {
     addMarker: (state, action: PayloadAction<MarkerData>) => {
       state.markers.push({ ...action.payload });
-      state.zoomedMarkerCoordinates.coordinates = action.payload.coordinates
-      state.zoomedMarkerCoordinates.zoomTime = Date.now()
-      let length = state.markers.length
+      state.zoomedMarkerCoordinates = action.payload.coordinates
+      state.zoomTime = Date.now()
+      const length = state.markers.length
       const newState = {
         ...selectedMarkerInitialState,
         id: length + 1
@@ -65,16 +63,17 @@ const markerSlice = createSlice({
     },
     selectMarker: (state, action: PayloadAction<number>) => {
       state.markers.map((e) => e.id == action.payload ? state.selectedMarker = e : null)
-      state.zoomedMarkerCoordinates.coordinates = state.selectedMarker.coordinates
-      state.zoomedMarkerCoordinates.zoomTime = Date.now()
+      state.zoomedMarkerCoordinates = state.selectedMarker.coordinates
+      state.zoomTime = Date.now()
     },
     editMarker: (state, action: PayloadAction<MarkerData>) => {
       state.selectedMarker = action.payload
     },
     saveEditedMarker: (state,) => {
-      state.markers = state.markers.map((e) => e.id == state.selectedMarker.id ? e = state.selectedMarker : e)
-      state.zoomedMarkerCoordinates.coordinates = state.selectedMarker.coordinates
-      state.zoomedMarkerCoordinates.zoomTime = Date.now()
+      state.markers = state.markers.map((e) => e.id === state.selectedMarker.id ? e = state.selectedMarker : e)
+      state.zoomedMarkerCoordinates = state.selectedMarker.coordinates
+      state.zoomTime = Date.now()
+      const length = state.markers.length
       const newState = {
         ...selectedMarkerInitialState,
         id: length + 1
@@ -82,7 +81,7 @@ const markerSlice = createSlice({
       state.selectedMarker = newState
     },
     newMarker: (state,) => {
-      let length = state.markers.length
+      const length = state.markers.length
       const newState = {
         ...selectedMarkerInitialState,
         id: length + 1
@@ -91,9 +90,15 @@ const markerSlice = createSlice({
     },
     editSearchValue: (state, action: PayloadAction<string>) => {
       state.searchValue = action.payload
-    }
+    },
+    editCoords: (state, action: PayloadAction<LatLng>) => {
+      state.zoomedMarkerCoordinates = action.payload
+    },
+    markerZoom: (state, ) => {
+      state.zoomTime = Date.now()
+    },
   }
 });
 
-export const { addMarker, selectMarker, editMarker, newMarker, saveEditedMarker, editSearchValue } = markerSlice.actions;
+export const { addMarker, selectMarker, editMarker, newMarker, saveEditedMarker, editSearchValue, editCoords, markerZoom } = markerSlice.actions;
 export default markerSlice.reducer;
