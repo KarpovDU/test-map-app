@@ -10,7 +10,7 @@ import { useDispatch, useSelector } from "react-redux";
 function ListHeader() {
 
     const dispatch = useDispatch<AppDispatch>();
-    const searchValue = useSelector((state: RootState) => state.markers).searchValue
+    const searchValue = useSelector((state: RootState) => state.markers.searchValue)
     
     const onPress = () => {
         dispatch(newMarker())

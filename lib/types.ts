@@ -16,9 +16,7 @@ export interface LatLng {
 export interface MarkerState {
     markers: MarkerData[];
     selectedMarker: MarkerData;
-    zoomedMarkerCoordinates: {
-        coordinates: LatLng
-        zoomTime: number
-    };
+    zoomedMarkerCoordinates: LatLng
     searchValue: string
+    zoomTime: number
 }
