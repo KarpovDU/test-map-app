@@ -1,0 +1,26 @@
+[
+    {
+        "id": 0,
+        "name": "АВС Дорстрой",
+        "coordinates": {
+            "lat": 58.002358,
+            "lng": 56.261055
+        },
+        "email": "mail@example.com",
+        "phoneNumber": 81234567890,
+        "workTime": "Пн-пт, 9-18",
+        "company": "ООО \"АВС Дорстрой\""
+    },
+    {
+        "id": 1,
+        "name": "Место #1",
+        "coordinates": {
+            "lat": 58.00810, 
+            "lng": 56.21893
+        },
+        "email": "mail@example.com",
+        "phoneNumber": 81234567890,
+        "workTime": "Пн-пт, 9-18",
+        "company": "ООО \"Компания 1\""
+    }
+]
