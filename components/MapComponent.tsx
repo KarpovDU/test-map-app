@@ -7,7 +7,6 @@ import L, { Map } from 'leaflet';
 import store, { AppDispatch, RootState } from '@/lib/Store';
 import { useDispatch, useSelector } from 'react-redux';
 import { selectMarker } from '@/lib/markerSlice';
-import { LatLng } from '@/lib/types';
 
 
 L.Icon.Default.mergeOptions({
