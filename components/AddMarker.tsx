@@ -5,7 +5,6 @@ import { AppDispatch, RootState } from "@/lib/Store";
 import { Button, Card, CardBody, Form } from "@nextui-org/react";
 import { Input } from "@nextui-org/react";
 import { useDispatch, useSelector } from "react-redux";
-import {PressEvent} from "@react-types/shared";
 
 
 
@@ -16,10 +15,8 @@ const AddMarker: React.FC = () => {
     
     
 
-    const inputChange = (e: any) => {
-        const id = e.target.getAttribute('id')
-        const value = e.target.value
-        let data = { ...marker }
+    const inputChange = (value: string, id: string) => {
+        const data = { ...marker }
         data.coordinates = {...marker.coordinates}
         switch (id) {
             case 'name':
@@ -49,12 +46,12 @@ const AddMarker: React.FC = () => {
         dispatch(editMarker(data))
     }
 
-    const saveAdd = (e: PressEvent) => {
+    const saveAdd = () => {
         if(marker.name && marker.coordinates.lat && marker.coordinates.lng)
         dispatch(addMarker(marker));
     };
 
-    const saveEditing = (e: PressEvent) => {
+    const saveEditing = () => {
         dispatch(saveEditedMarker())
     }
 
@@ -66,13 +63,13 @@ const AddMarker: React.FC = () => {
                         <div className="w-full text-center my-4 text-primary text-2xl font-sans">
                             {marker.id == (markers.markers.length + 1) ? <>Создать источник</> : <>Изменить источник</>}
                         </div>
-                        <Input id="name" isRequired label="Наименование" placeholder="Карьер #1" type="string" value={marker.name} onChange={inputChange}/>
-                        <Input id="lat" isRequired label="Широта" placeholder="0.000..." type="number" value={!marker.coordinates.lat ? '' : marker.coordinates.lat.toString()} onChange={inputChange}/>
-                        <Input id="lng" isRequired label="Долгота" placeholder="0.000..." type="number" value={!marker.coordinates.lng ? '' : marker.coordinates.lng.toString()} onChange={inputChange}/>
-                        <Input id="email" label="Email" type="email" placeholder="mail@example.com" value={marker.email} onChange={inputChange}/>
-                        <Input id="phone" label="Телефон" type="number" placeholder="+7 (123) 456-78-90" value={!marker.phoneNumber ? '' : marker.phoneNumber.toString()} onChange={inputChange}/>
-                        <Input id="time" label="Часы работы" placeholder="Пн-пт, 9-17" type="string" value={marker.workTime} onChange={inputChange} />
-                        <Input id="company" label="Название компании" placeholder='ООО "Название компании"' type="string" value={marker.company} onChange={inputChange}/>
+                        <Input isRequired label="Наименование" placeholder="Карьер #1" type="string" value={marker.name} onValueChange={(val: string) => inputChange(val, 'name')}/>
+                        <Input isRequired label="Широта" placeholder="0.000..." type="number" value={!marker.coordinates.lat ? '' : marker.coordinates.lat.toString()} onValueChange={(val: string) => inputChange(val, 'lat')}/>
+                        <Input isRequired label="Долгота" placeholder="0.000..." type="number" value={!marker.coordinates.lng ? '' : marker.coordinates.lng.toString()} onValueChange={(val: string) => inputChange(val, 'lng')}/>
+                        <Input label="Email" type="email" placeholder="mail@example.com" value={marker.email} onValueChange={(val: string) => inputChange(val, "email")}/>
+                        <Input label="Телефон" type="number" placeholder="+7 (123) 456-78-90" value={!marker.phoneNumber ? '' : marker.phoneNumber.toString()} onValueChange={(val: string) => inputChange(val, 'phone')}/>
+                        <Input label="Часы работы" placeholder="Пн-пт, 9-17" type="string" value={marker.workTime}  onValueChange={(val: string) => inputChange(val, "time")}/>
+                        <Input label="Название компании" placeholder='ООО "Название компании"' type="string" value={marker.company} onValueChange={(val: string) => inputChange(val, 'company')}/>
                         {marker.id == (markers.markers.length + 1) ? 
                         <Button className="w-full text-center my-4" color="primary" type="button" onPress={saveAdd}>Добавить</Button>: 
                         <Button className="w-full text-center my-4" color="primary" type="button" onPress={saveEditing}>Сохранить</Button>}

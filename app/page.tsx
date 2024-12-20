@@ -1,6 +1,6 @@
 import AddMarker from '@/components/AddMarker'
-import MapComponent from '@/components/MapComponent'
 import MarkerList from '@/components/MarkerList';
+import NoSSRMapComponent from '@/components/NoSSRMapComponent';
 import { ThemeSwitcher } from '@/components/ThemeSwitcher';
 
 export default function Home() {
@@ -9,7 +9,7 @@ export default function Home() {
       <ThemeSwitcher/>
       <MarkerList/>
       <AddMarker/>
-      <MapComponent/>
+      <NoSSRMapComponent/>
     </div>
   )
 

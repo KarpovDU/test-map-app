@@ -16,8 +16,7 @@ function ListHeader() {
         dispatch(newMarker())
     }
 
-    const onSearch = (e: any) => {
-        const value = e.target.value
+    const onSearch = (value: string) => {
         dispatch(editSearchValue(value))
     }
 
@@ -32,7 +31,7 @@ function ListHeader() {
             </div>
 
             <Input
-                onChange={onSearch}
+                onValueChange={(val: string) => onSearch(val)}
                 onClear={onClear}
                 value={searchValue}
                 className="mt-2"
