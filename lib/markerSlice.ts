@@ -44,7 +44,7 @@ const checkValid = (obj: InvalidInputs) => {
   return Object.values(obj).filter((i: boolean) => i === true).length === 0
 }
 
-function setBooleanToFalse<T extends { [key: string]: any }>(obj: T): T {
+function setBooleanToFalse<T extends { [key: string]: boolean }>(obj: T): T {
 
     for (const key in obj) {
          if (typeof obj[key] === 'boolean') {
@@ -130,7 +130,7 @@ const markerSlice = createSlice({
       state.zoomTime = Date.now()
     },
     checkValidInputs: (state,) => {
-      state.selectedMarker.name === '' ? state.invalidInputs.name = true : null
+      state.invalidInputs.name = state.selectedMarker.name === '' ? true : state.invalidInputs.name
       state.invalidInputs.phoneNumber = !(phoneNumberRegex.test(state.selectedMarker.phoneNumber) || state.selectedMarker.phoneNumber === '')
       state.invalidInputs.email = !(emailRegex.test(state.selectedMarker.email) || state.selectedMarker.email === '')
     }

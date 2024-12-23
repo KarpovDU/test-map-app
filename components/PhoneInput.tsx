@@ -29,7 +29,7 @@ const PhoneInput: React.FC = ({ }) => {
                 dispatch(editMarker(data))
             }
         } else if (value < phoneNumber) {
-            let arr = [...phoneNumber]
+            const arr = [...phoneNumber]
             let isDeleted = false
             newValue = arr.reverse().map((i: string) => {
                 if (isNumber(i) && !isDeleted) {
