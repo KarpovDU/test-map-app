@@ -1,6 +1,6 @@
 'use client'
 
-import { addMarker, checkValid, checkValidInputs, editMarker, newMarker, removeMarker, saveEditedMarker } from "@/lib/markerSlice";
+import { addMarker, checkValid, checkValidInputs, editMarker, removeMarker, saveEditedMarker } from "@/lib/markerSlice";
 import store, { AppDispatch, RootState } from "@/lib/Store";
 import { Button, Card, CardBody, Form } from "@nextui-org/react";
 import { Input } from "@nextui-org/react";
@@ -8,6 +8,7 @@ import { useDispatch, useSelector } from "react-redux";
 import React from "react"
 import PhoneInput from "./PhoneInput";
 import { createSource, deleteSource, updateSource } from "@/api/sources";
+import { NewMarker } from "@/lib/types";
 
 const AddMarker: React.FC = () => {
     const dispatch = useDispatch<AppDispatch>();
@@ -47,7 +48,7 @@ const AddMarker: React.FC = () => {
         e.preventDefault()
         dispatch(checkValidInputs())
         if (checkValid(store.getState().markers.invalidInputs)) {
-            const { id: _, ...inputData } = store.getState().markers.selectedMarker
+            const inputData : NewMarker = store.getState().markers.selectedMarker
             const data = await createSource(inputData)
             if (data) {
                 dispatch(addMarker(data));

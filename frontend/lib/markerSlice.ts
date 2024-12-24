@@ -1,4 +1,4 @@
-import { createSource, getSources } from '@/api/sources';
+import { getSources } from '@/api/sources';
 import { InvalidInputs, LatLng, MarkerData, MarkerState } from '@/lib/types';
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 
