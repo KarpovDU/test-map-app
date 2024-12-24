@@ -1,12 +1,12 @@
 'use client'
 
 import React, { useEffect, useRef } from 'react';
-import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
+import { MapContainer, TileLayer, Marker, Popup, useMapEvents } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
 import L, { DragEndEvent, Marker as LeafletMarker, Map } from 'leaflet';
 import store, { AppDispatch, RootState } from '@/lib/Store';
 import { useDispatch, useSelector } from 'react-redux';
-import { editCoords, editMarker, markerZoom, selectMarker } from '@/lib/markerSlice';
+import { editCoords, editMarker, mapClickAddMarker, markerZoom, selectMarker, temporaryMarkerDrag } from '@/lib/markerSlice';
 import { FaRegEnvelope, FaRegCalendarDays, FaRegBuilding } from "react-icons/fa6";
 import { HiOutlinePhone } from "react-icons/hi2";
 import iconRetinaUrl from 'leaflet/dist/images/marker-icon-2x.png'
@@ -38,11 +38,23 @@ const MapComponent: React.FC = () => {
         else dispatch(selectMarker(id))
     }
 
-    const dragMarker = (leafletMarker: LeafletMarker) => {
+    const dragMarker = (leafletMarker: LeafletMarker, temporary: boolean) => {
         const latLng = {...leafletMarker.getLatLng()}
         const data = {...store.getState().markers.selectedMarker, lat: latLng.lat, lng: latLng.lng}
         dispatch(editMarker(data))
         dispatch(editCoords(latLng))
+        if(temporary) {
+            dispatch(temporaryMarkerDrag(latLng))
+        }
+    }
+
+    function MapEvents() {
+        useMapEvents({
+            click(e: L.LeafletMouseEvent) {
+                dispatch(mapClickAddMarker({...e.latlng}))
+            }
+        })
+        return null;
     }
 
     useEffect(() => {
@@ -63,13 +75,23 @@ const MapComponent: React.FC = () => {
                     url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
                     attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
                 />
+                <MapEvents/>
+                {markers.temporaryMarker ? 
+                     <Marker
+                     draggable
+                     position={[markers.temporaryMarker.lat, markers.temporaryMarker.lng]}
+                     eventHandlers={{
+                        dragend: (e: DragEndEvent ) => dragMarker(e.target as LeafletMarker, true)
+                     }}
+                 /> 
+                : null}
                 {markers.markers.map((marker) => (
                     <Marker
                         ref={markerRef}
                         draggable={markers.selectedMarker.id === marker.id}
                         eventHandlers={{
                             click: () => handleMarkerClick(marker.id),
-                            dragend: (e: DragEndEvent ) => dragMarker(e.target as LeafletMarker)
+                            dragend: (e: DragEndEvent ) => dragMarker(e.target as LeafletMarker, false)
                         }}
                         key={marker.id}
                         position={markers.selectedMarker.id === marker.id ? selectedCoordinates : [marker.lat, marker.lng]}

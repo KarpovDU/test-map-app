@@ -64,7 +64,8 @@ const initialState: MarkerState = {
     name: false,
     phoneNumber: false,
     email: false
-  }
+  },
+  temporaryMarker: null
 };
 
 
@@ -74,6 +75,7 @@ const markerSlice = createSlice({
   reducers: {
     addMarker: (state, action: PayloadAction<MarkerData>) => {
       if (checkValid(state.invalidInputs)) {
+        state.temporaryMarker = null
         state.markers.push({ ...action.payload });
         state.zoomedMarkerCoordinates = {lat: action.payload.lat, lng: action.payload.lng} 
         state.zoomTime = Date.now()
@@ -84,6 +86,7 @@ const markerSlice = createSlice({
       state.markers.map((e) => e.id == action.payload ? state.selectedMarker = e : null)
       state.zoomedMarkerCoordinates = {lat: state.selectedMarker.lat, lng: state.selectedMarker.lng}
       state.zoomTime = Date.now()
+      state.temporaryMarker = null
     },
     editMarker: (state, action: PayloadAction<MarkerData>) => {
       if (!checkValid(state.invalidInputs)) {
@@ -95,13 +98,15 @@ const markerSlice = createSlice({
       if (checkValid(state.invalidInputs)) {
         state.markers = state.markers.map((e) => e.id === state.selectedMarker.id ? e = state.selectedMarker : e)
         state.zoomedMarkerCoordinates = {lat: state.selectedMarker.lat, lng: state.selectedMarker.lng} 
-
         state.zoomTime = Date.now()
         state.selectedMarker = {...selectedMarkerInitialState}
+        
       }
     },
     newMarker: (state,) => {
-      state.selectedMarker = {...selectedMarkerInitialState}
+      if(!state.temporaryMarker) {
+        state.selectedMarker = {...selectedMarkerInitialState}
+      }
     },
     editSearchValue: (state, action: PayloadAction<string>) => {
       state.searchValue = action.payload
@@ -120,9 +125,22 @@ const markerSlice = createSlice({
     removeMarker: (state, action: PayloadAction<number>) => {
       state.markers = state.markers.filter(el => el.id !== action.payload)
       state.selectedMarker = {...selectedMarkerInitialState}
+    },
+    mapClickAddMarker: (state, action: PayloadAction<LatLng>) => {
+      if(state.temporaryMarker || state.selectedMarker.id === -1) {
+        state.selectedMarker = {...state.selectedMarker, ...action.payload}
+      } else {
+        state.selectedMarker = {...selectedMarkerInitialState, ...action.payload}
+      }
+      state.temporaryMarker = {...action.payload}
+      state.zoomedMarkerCoordinates = {...action.payload}
+      state.zoomTime = Date.now()
+    },
+    temporaryMarkerDrag: (state, action: PayloadAction<LatLng>) => {
+      state.temporaryMarker = {...action.payload}
     }
   }
 });
 
-export const { addMarker, selectMarker, editMarker, newMarker, saveEditedMarker, editSearchValue, editCoords, markerZoom, checkValidInputs, removeMarker } = markerSlice.actions;
+export const { addMarker, selectMarker, editMarker, newMarker, saveEditedMarker, editSearchValue, editCoords, markerZoom, checkValidInputs, removeMarker, mapClickAddMarker, temporaryMarkerDrag } = markerSlice.actions;
 export default markerSlice.reducer;

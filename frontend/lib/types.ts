@@ -26,5 +26,6 @@ export interface MarkerState {
     zoomedMarkerCoordinates: LatLng
     searchValue: string
     zoomTime: number
+    temporaryMarker: LatLng | null
     invalidInputs: InvalidInputs
 }
