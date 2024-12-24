@@ -1,7 +1,7 @@
 'use client'
 
 import React, { useEffect, useRef } from 'react';
-import { MapContainer, TileLayer, Marker, Popup, useMapEvents, useMap } from 'react-leaflet';
+import { MapContainer, TileLayer, Marker, Popup, useMapEvents } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
 import L, { DragEndEvent, Marker as LeafletMarker, Map } from 'leaflet';
 import store, { AppDispatch, RootState } from '@/lib/Store';

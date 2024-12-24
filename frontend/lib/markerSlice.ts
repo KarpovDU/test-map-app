@@ -127,7 +127,11 @@ const markerSlice = createSlice({
       state.selectedMarker = {...selectedMarkerInitialState}
     },
     mapClickAddMarker: (state, action: PayloadAction<LatLng>) => {
-      state.temporaryMarker || state.selectedMarker.id === -1 ? state.selectedMarker = {...state.selectedMarker, ...action.payload} : state.selectedMarker = {...selectedMarkerInitialState, ...action.payload}
+      if(state.temporaryMarker || state.selectedMarker.id === -1) {
+        state.selectedMarker = {...state.selectedMarker, ...action.payload}
+      } else {
+        state.selectedMarker = {...selectedMarkerInitialState, ...action.payload}
+      }
       state.temporaryMarker = {...action.payload}
       state.zoomedMarkerCoordinates = {...action.payload}
       state.zoomTime = Date.now()
