@@ -1,3 +1,4 @@
+import { getSources } from '@/api/sources';
 import { InvalidInputs, LatLng, MarkerData, MarkerState } from '@/lib/types';
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 
@@ -5,15 +6,13 @@ const phoneNumberRegex = /^\+7\s\(\d{3}\)\s\d{3}-\d{2}-\d{2}$/;
 const emailRegex = /^\S+@\S+\.\S+$/;
 
 const selectedMarkerInitialState: MarkerData = {
-  id: 1,
+  id: -1,
   name: '',
-  coordinates: {
-    lat: 0,
-    lng: 0,
-  },
+  lat: 0,
+  lng: 0,
   email: '',
-  phoneNumber: '',
-  workTime: '',
+  phonenumber: '',
+  worktime: '',
   company: '',
 }
 
@@ -40,7 +39,7 @@ function getCurrentPosition(): LatLng {
   };
 }
 
-const checkValid = (obj: InvalidInputs) => {
+export const checkValid = (obj: InvalidInputs) => {
   return Object.values(obj).filter((i: boolean) => i === true).length === 0
 }
 
@@ -56,7 +55,7 @@ function setBooleanToFalse<T extends { [key: string]: boolean }>(obj: T): T {
  }
 
 const initialState: MarkerState = {
-  markers: [],
+  markers: await getSources() || [],
   selectedMarker: selectedMarkerInitialState,
   zoomedMarkerCoordinates: getCurrentPosition(),
   searchValue: '',
@@ -76,19 +75,14 @@ const markerSlice = createSlice({
     addMarker: (state, action: PayloadAction<MarkerData>) => {
       if (checkValid(state.invalidInputs)) {
         state.markers.push({ ...action.payload });
-        state.zoomedMarkerCoordinates = action.payload.coordinates
+        state.zoomedMarkerCoordinates = {lat: action.payload.lat, lng: action.payload.lng} 
         state.zoomTime = Date.now()
-        const length = state.markers.length
-        const newState = {
-          ...selectedMarkerInitialState,
-          id: length + 1
-        }
-        state.selectedMarker = newState
+        state.selectedMarker = {...selectedMarkerInitialState}
       }
     },
     selectMarker: (state, action: PayloadAction<number>) => {
       state.markers.map((e) => e.id == action.payload ? state.selectedMarker = e : null)
-      state.zoomedMarkerCoordinates = state.selectedMarker.coordinates
+      state.zoomedMarkerCoordinates = {lat: state.selectedMarker.lat, lng: state.selectedMarker.lng}
       state.zoomTime = Date.now()
     },
     editMarker: (state, action: PayloadAction<MarkerData>) => {
@@ -100,25 +94,14 @@ const markerSlice = createSlice({
     saveEditedMarker: (state,) => {
       if (checkValid(state.invalidInputs)) {
         state.markers = state.markers.map((e) => e.id === state.selectedMarker.id ? e = state.selectedMarker : e)
-        state.zoomedMarkerCoordinates = state.selectedMarker.coordinates
+        state.zoomedMarkerCoordinates = {lat: state.selectedMarker.lat, lng: state.selectedMarker.lng} 
+
         state.zoomTime = Date.now()
-        const length = state.markers.length
-        const newState = {
-          ...selectedMarkerInitialState,
-          id: length + 1
-        }
-        state.selectedMarker = newState
+        state.selectedMarker = {...selectedMarkerInitialState}
       }
     },
     newMarker: (state,) => {
-
-      const length = state.markers.length
-      const newState = {
-        ...selectedMarkerInitialState,
-        id: length + 1
-      }
-      state.selectedMarker = newState
-
+      state.selectedMarker = {...selectedMarkerInitialState}
     },
     editSearchValue: (state, action: PayloadAction<string>) => {
       state.searchValue = action.payload
@@ -131,11 +114,15 @@ const markerSlice = createSlice({
     },
     checkValidInputs: (state,) => {
       state.invalidInputs.name = state.selectedMarker.name === '' ? true : state.invalidInputs.name
-      state.invalidInputs.phoneNumber = !(phoneNumberRegex.test(state.selectedMarker.phoneNumber) || state.selectedMarker.phoneNumber === '')
+      state.invalidInputs.phoneNumber = !(phoneNumberRegex.test(state.selectedMarker.phonenumber) || state.selectedMarker.phonenumber === '')
       state.invalidInputs.email = !(emailRegex.test(state.selectedMarker.email) || state.selectedMarker.email === '')
+    },
+    removeMarker: (state, action: PayloadAction<number>) => {
+      state.markers = state.markers.filter(el => el.id !== action.payload)
+      state.selectedMarker = {...selectedMarkerInitialState}
     }
   }
 });
 
-export const { addMarker, selectMarker, editMarker, newMarker, saveEditedMarker, editSearchValue, editCoords, markerZoom, checkValidInputs } = markerSlice.actions;
+export const { addMarker, selectMarker, editMarker, newMarker, saveEditedMarker, editSearchValue, editCoords, markerZoom, checkValidInputs, removeMarker } = markerSlice.actions;
 export default markerSlice.reducer;

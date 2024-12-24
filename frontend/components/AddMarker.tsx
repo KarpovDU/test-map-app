@@ -1,12 +1,14 @@
 'use client'
 
-import { addMarker, checkValidInputs, editMarker, saveEditedMarker } from "@/lib/markerSlice";
-import { AppDispatch, RootState } from "@/lib/Store";
+import { addMarker, checkValid, checkValidInputs, editMarker, removeMarker, saveEditedMarker } from "@/lib/markerSlice";
+import store, { AppDispatch, RootState } from "@/lib/Store";
 import { Button, Card, CardBody, Form } from "@nextui-org/react";
 import { Input } from "@nextui-org/react";
 import { useDispatch, useSelector } from "react-redux";
 import React from "react"
 import PhoneInput from "./PhoneInput";
+import { createSource, deleteSource, updateSource } from "@/api/sources";
+import { NewMarker } from "@/lib/types";
 
 const AddMarker: React.FC = () => {
     const dispatch = useDispatch<AppDispatch>();
@@ -17,22 +19,21 @@ const AddMarker: React.FC = () => {
 
     const inputChange = (value: string, id: string) => {
         const data = { ...marker }
-        data.coordinates = { ...marker.coordinates }
         switch (id) {
             case 'name':
                 data.name = value
                 break;
             case 'lat':
-                data.coordinates.lat = value !== '' ? parseFloat(value) : 0
+                data.lat = value !== '' ? parseFloat(value) : 0
                 break;
             case 'lng':
-                data.coordinates.lng = value !== '' ? parseFloat(value) : 0
+                data.lng = value !== '' ? parseFloat(value) : 0
                 break;
             case 'email':
                 data.email = value
                 break;
             case 'time':
-                data.workTime = value
+                data.worktime = value
                 break;
             case 'company':
                 data.company = value
@@ -43,25 +44,43 @@ const AddMarker: React.FC = () => {
         dispatch(editMarker(data))
     }
 
-    const saveAdd = (e: React.FormEvent) => {
+    const saveAdd = async (e: React.FormEvent) => {
         e.preventDefault()
         dispatch(checkValidInputs())
-        dispatch(addMarker(marker));
+        if (checkValid(store.getState().markers.invalidInputs)) {
+            const inputData : NewMarker = store.getState().markers.selectedMarker
+            const data = await createSource(inputData)
+            if (data) {
+                dispatch(addMarker(data));
+            }
+        }
     };
 
-    const saveEditing = (e: React.FormEvent) => {
+    const saveEditing = async (e: React.FormEvent) => {
         e.preventDefault()
         dispatch(checkValidInputs())
-        dispatch(saveEditedMarker())
+        if (checkValid(store.getState().markers.invalidInputs)) {
+            const data = await updateSource(store.getState().markers.selectedMarker)
+            if (data) {
+                dispatch(saveEditedMarker())
+            }
+        }
+    }
+
+    const deleteMarker = async () => {
+        const isDeleted = await deleteSource(marker.id)
+        if(isDeleted) {
+            dispatch(removeMarker(marker.id))
+        }
     }
 
     return (
         <div className="h-full w-[25%] p-5">
             <Card className='h-full w-full'>
                 <CardBody className="w-full">
-                    <Form className="w-full flex flex-col" onSubmit={marker.id == (markers.markers.length + 1) ? saveAdd : saveEditing}>
+                    <Form className="w-full flex flex-col" onSubmit={markers.markers.find(el => el.id === marker.id) ? saveEditing : saveAdd}>
                         <div className="w-full text-center my-4 text-primary text-2xl font-sans">
-                            {marker.id == (markers.markers.length + 1) ? <>Создать источник</> : <>Изменить источник</>}
+                            {markers.markers.find(el => el.id === marker.id) ? "Изменить источник" : "Создать источник"}
                         </div>
                         <Input
                             isRequired
@@ -69,7 +88,7 @@ const AddMarker: React.FC = () => {
                             label="Наименование"
                             placeholder="Карьер #1"
                             type="string"
-                            value={marker.name}
+                            value={marker.name ?? ''}
                             isInvalid={markers.invalidInputs.name}
                             onValueChange={(val: string) => inputChange(val, 'name')}
                         />
@@ -77,41 +96,50 @@ const AddMarker: React.FC = () => {
                             isRequired
                             label="Широта"
                             type="number"
-                            value={marker.coordinates.lat.toString()}
+                            value={marker.lat.toString() ?? ''}
                             onValueChange={(val: string) => inputChange(val, 'lat')}
                         />
                         <Input
                             isRequired
                             label="Долгота"
                             type="number"
-                            value={marker.coordinates.lng.toString()}
+                            value={marker.lng.toString() ?? ''}
                             onValueChange={(val: string) => inputChange(val, 'lng')}
                         />
                         <Input
-                        errorMessage="Введите корректный адрес электронной почты!"
+                            errorMessage="Введите корректный адрес электронной почты!"
                             label="Email"
                             type="email"
                             isInvalid={markers.invalidInputs.email}
                             placeholder="mail@example.com"
-                            value={marker.email}
+                            value={marker.email ?? ''}
                             onValueChange={(val: string) => inputChange(val, "email")}
                         />
                         <PhoneInput />
                         <Input
                             label="Часы работы"
                             placeholder="Пн-пт, 9-17"
-                            type="string" value={marker.workTime}
+                            type="string" value={marker.worktime ?? ''}
                             onValueChange={(val: string) => inputChange(val, "time")} />
                         <Input
                             label="Название компании"
                             placeholder='ООО "Название компании"'
-                            type="string" value={marker.company}
+                            type="string" value={marker.company ?? ''}
                             onValueChange={(val: string) => inputChange(val, 'company')}
                         />
-
-                        <Button className="w-full text-center my-4" color="primary" type="submit" >
-                            {marker.id == (markers.markers.length + 1) ? "Добавить" : "Сохранить"}
-                        </Button>
+                        {markers.markers.find(el => el.id === marker.id) ?
+                            <div className="flex w-full my-4 gap-4">
+                                <Button className="w-[50%] text-center" color="primary" type="submit" >
+                                    Сохранить
+                                </Button>
+                                <Button className="w-[50%] text-center" color="primary" type="button" onPress={deleteMarker}>
+                                    Удалить
+                                </Button>
+                            </div>
+                            :
+                            <Button className="w-full text-center my-4" color="primary"  type="submit" >
+                                Добавить
+                            </Button>}
                     </Form>
                 </CardBody>
             </Card>

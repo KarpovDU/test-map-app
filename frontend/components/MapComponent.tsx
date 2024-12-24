@@ -40,7 +40,7 @@ const MapComponent: React.FC = () => {
 
     const dragMarker = (leafletMarker: LeafletMarker) => {
         const latLng = {...leafletMarker.getLatLng()}
-        const data = {...store.getState().markers.selectedMarker, coordinates: latLng}
+        const data = {...store.getState().markers.selectedMarker, lat: latLng.lat, lng: latLng.lng}
         dispatch(editMarker(data))
         dispatch(editCoords(latLng))
     }
@@ -72,14 +72,14 @@ const MapComponent: React.FC = () => {
                             dragend: (e: DragEndEvent ) => dragMarker(e.target as LeafletMarker)
                         }}
                         key={marker.id}
-                        position={markers.selectedMarker.id === marker.id ? selectedCoordinates : [marker.coordinates.lat, marker.coordinates.lng]}
+                        position={markers.selectedMarker.id === marker.id ? selectedCoordinates : [marker.lat, marker.lng]}
                     >
                         <Popup>
-                            <div className='text-medium'>{marker.id}. {marker.name}</div>
+                            <div className='text-medium text-primary'>{marker.id}. {marker.name}</div>
                             {marker.company !== '' ? <div className='flex'><br /><FaRegBuilding className='mr-1' /><div className='font-bold mr-1'>{marker.company}</div></div> : null}
                             {marker.email !== '' ? <div className='flex'><br /><FaRegEnvelope className='mr-1' /><div className='font-bold mr-1'>Email:</div>{marker.email}</div> : null}
-                            {marker.phoneNumber ? <div className='flex'><br /><HiOutlinePhone className='mr-1' /><div className='font-bold mr-1'>Телефон:</div>{marker.phoneNumber}</div> : null}
-                            {marker.workTime !== '' ? <div className='flex'><br /><FaRegCalendarDays className='mr-1' /><div className='font-bold mr-1'>Часы работы:</div>{marker.workTime}</div> : null}
+                            {marker.phonenumber ? <div className='flex'><br /><HiOutlinePhone className='mr-1' /><div className='font-bold mr-1'>Телефон:</div>{marker.phonenumber}</div> : null}
+                            {marker.worktime !== '' ? <div className='flex'><br /><FaRegCalendarDays className='mr-1' /><div className='font-bold mr-1'>Часы работы:</div>{marker.worktime}</div> : null}
                         </Popup>
                     </Marker>
                 ))}

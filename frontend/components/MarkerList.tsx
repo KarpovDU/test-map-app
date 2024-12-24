@@ -28,7 +28,7 @@ const MarkerList: React.FC = () => {
                             <div className="flex h-content flex-col  p-0 m-0">
                                 {markers.markers.filter((marker) => marker.id === parseFloat(searchValue) || marker.name.includes(searchValue)).map((marker) => (
                                     <Button
-                                        id={marker.id != null ? marker.id.toString() : undefined}
+                                        id={marker.id.toString()}
                                         key={marker.id}
                                         className="w-full"
                                         variant="flat"

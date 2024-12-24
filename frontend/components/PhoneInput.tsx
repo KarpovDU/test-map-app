@@ -14,18 +14,18 @@ const PhoneInput: React.FC = ({ }) => {
 
     const onChange = (value: string) => {
         const data = { ...marker }
-        const phoneNumber = data.phoneNumber
+        const phoneNumber = data.phonenumber
         const char = value.charAt(value.length - 1);
         let newValue
         if (isNumber(char) && value > phoneNumber) {
             if (phoneNumber === '') {
                 newValue = mask.replace('_', char);
-                data.phoneNumber = newValue
+                data.phonenumber = newValue
                 dispatch(editMarker(data))
             } else {
                 newValue = value.replace('_', char);
                 newValue = newValue.substring(0, newValue.length - 1);
-                data.phoneNumber = newValue
+                data.phonenumber = newValue
                 dispatch(editMarker(data))
             }
         } else if (value < phoneNumber) {
@@ -41,10 +41,10 @@ const PhoneInput: React.FC = ({ }) => {
                 }
             }).reverse().join('')
             if (newValue === mask) {
-                data.phoneNumber = ''   
+                data.phonenumber = ''   
                 dispatch(editMarker(data))
             } else {
-                data.phoneNumber = newValue
+                data.phonenumber = newValue
                 dispatch(editMarker(data))
             }
         }
@@ -58,7 +58,7 @@ const PhoneInput: React.FC = ({ }) => {
             placeholder='+7 (900) 123-45-67'
             type="tel"
             isInvalid={isInvalid}
-            value={marker.phoneNumber}
+            value={marker.phonenumber ?? ''}
             onValueChange={(value: string) => onChange(value)}
         />
     );

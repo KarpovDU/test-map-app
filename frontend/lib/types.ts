@@ -1,12 +1,13 @@
-export type MarkerData = {
+export interface MarkerData extends LatLng {
     id: number
     name: string
-    coordinates: LatLng
     email: string
-    phoneNumber: string
-    workTime: string
+    phonenumber: string
+    worktime: string
     company: string
-}
+} 
+
+export type NewMarker = Omit<MarkerData, 'id'>
 
 export interface LatLng {
     lat: number;
