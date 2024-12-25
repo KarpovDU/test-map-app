@@ -1,17 +1,24 @@
 'use client'
 
 import React, { useEffect, useRef } from 'react';
-import { MapContainer, TileLayer, Marker, Popup, useMapEvents } from 'react-leaflet';
-import 'leaflet/dist/leaflet.css';
-import L, { DragEndEvent, Marker as LeafletMarker, Map } from 'leaflet';
+
+//Redux
 import store, { AppDispatch, RootState } from '@/lib/Store';
 import { useDispatch, useSelector } from 'react-redux';
 import { editCoords, editMarker, mapClickAddMarker, markerZoom, selectMarker, temporaryMarkerDrag } from '@/lib/markerSlice';
-import { FaRegEnvelope, FaRegCalendarDays, FaRegBuilding } from "react-icons/fa6";
-import { HiOutlinePhone } from "react-icons/hi2";
+
+//Leaflet
+import { MapContainer, TileLayer, Marker, Popup, useMapEvents } from 'react-leaflet';
+import 'leaflet/dist/leaflet.css';
+import L, { DragEndEvent, Marker as LeafletMarker, Map } from 'leaflet';
 import iconRetinaUrl from 'leaflet/dist/images/marker-icon-2x.png'
 import iconUrl from 'leaflet/dist/images/marker-icon.png'
 import shadowUrl from 'leaflet/dist/images/marker-shadow.png'
+
+//React icons
+import { FaRegEnvelope, FaRegCalendarDays, FaRegBuilding } from "react-icons/fa6";
+import { HiOutlinePhone } from "react-icons/hi2";
+import MarkerCluster from './MarkerCluster';
 
 L.Icon.Default.mergeOptions({
     iconRetinaUrl,
@@ -32,21 +39,9 @@ const MapComponent: React.FC = () => {
 
     const dispatch = useDispatch<AppDispatch>();
 
-    const handleMarkerClick = (id: number) => {
-        const selectedId = store.getState().markers.selectedMarker.id
-        if (selectedId === id) dispatch(markerZoom())
-        else dispatch(selectMarker(id))
-    }
 
-    const dragMarker = (leafletMarker: LeafletMarker, temporary: boolean) => {
-        const latLng = {...leafletMarker.getLatLng()}
-        const data = {...store.getState().markers.selectedMarker, lat: latLng.lat, lng: latLng.lng}
-        dispatch(editMarker(data))
-        dispatch(editCoords(latLng))
-        if(temporary) {
-            dispatch(temporaryMarkerDrag(latLng))
-        }
-    }
+
+    
 
     function MapEvents() {
         useMapEvents({
@@ -75,8 +70,9 @@ const MapComponent: React.FC = () => {
                     url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
                     attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
                 />
-                <MapEvents/>
-                {markers.temporaryMarker ? 
+                <MapEvents/> 
+                <MarkerCluster/>             
+                {/* {markers.temporaryMarker ? 
                      <Marker
                      draggable
                      position={[markers.temporaryMarker.lat, markers.temporaryMarker.lng]}
@@ -104,7 +100,7 @@ const MapComponent: React.FC = () => {
                             {marker.worktime !== '' ? <div className='flex'><br /><FaRegCalendarDays className='mr-1' /><div className='font-bold mr-1'>Часы работы:</div>{marker.worktime}</div> : null}
                         </Popup>
                     </Marker>
-                ))}
+                ))} */}
             </MapContainer>
         </div>
     );
